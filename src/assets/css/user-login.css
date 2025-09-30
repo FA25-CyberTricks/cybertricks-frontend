@@ -1,0 +1,32 @@
+.hero{display:flex; flex-direction:column; align-items:center; text-align:center;}
+.welcome{margin:0px 0 8px; font-weight:300; letter-spacing: .3px; color:#d7d7d7;}
+.logo-wordmark{margin:0 0 28px; font-family: Orbitron, Inter, sans-serif; font-size: clamp(32px, 5vw, 60px); letter-spacing:2px; font-weight:900;}
+.login-card{width:min(480px, 92vw); display:flex; flex-direction:column; gap:18px;}
+.input{background: linear-gradient(180deg, var(--field), var(--field2)); border:1px solid var(--ring); border-radius:32px; padding:10px;}
+.input input{width:100%; height: 40px;; border:none; outline:none; background:transparent; color:#fff; padding:0 22px; font-size:16px;}
+.row{display:flex; gap:18px;}
+.two-col > .input{flex:1;}
+.checkbox{display:flex; align-items:center; gap:12px; color:#d9d9d9; font-size:15px;}
+.checkbox input{width:18px; height:18px; accent-color:#fff;}
+.checkbox.agree{margin-top:4px;}
+.link{color:#ffb3b3; text-decoration: underline;}
+.link.light{color:#ff6666;}
+.signup{margin: 8px 0 80px; color:#cfcfcf; font-style: italic;}
+.between{ justify-content: space-between; }
+
+.btn-primary{
+  height:60px; border:none; cursor:pointer;
+  border-radius: 32px;
+  background: var(--btn-red);
+  color:#fff; font-size:24px; font-weight:700;
+  letter-spacing:.3px;
+  transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+}
+.btn-primary:hover{ filter: brightness(1.05); box-shadow: 0 10px 28px rgba(216,14,14,.45); }
+.btn-primary:active{ transform: translateY(1px); }
+
+@media (max-width: 900px){.nav-links{ display:none;}
+@media (max-width: 560px){.navbar{ gap:14px;}
+.avatar{width:40px; height:40px;}
+.row{flex-direction:column;}
+}}
