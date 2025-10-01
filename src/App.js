@@ -1,17 +1,35 @@
-import Header from "./app/user/layouts/Header";
-import Footer from "./app/user/layouts/Footer";
+import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+
 import Home from "./app/user/pages/home/Home";
+import Login from "./app/user/pages/login/Login";
+import Register from "./app/user/pages/login/Register";
+import "react-toastify/dist/ReactToastify.css";
 
-// (tuỳ chọn) nếu muốn global riêng cho role user, import ở đây:
-// import "./app/user/user-global.css";
+function App() {
 
-export default function App() {
   return (
-    <>
-      <Header />
-      <Home />
-      <Footer />
-    </>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+
+        {/* toast message */}
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          pauseOnHover
+        />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
+export default App;

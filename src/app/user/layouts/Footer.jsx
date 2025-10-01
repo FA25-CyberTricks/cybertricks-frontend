@@ -9,8 +9,20 @@ export default function Footer() {
         {/* Brand */}
         <div className="ft-brand">
           <div className="ft-logo">
-            <span className="brand-mark">CT</span>
-            <span className="wordmark">CYBERTRICK</span>
+             <a href="/" className="brand-mark">
+                <img 
+                    src="assets/images/cybertrick-logo-03.png" 
+                    alt="logo" 
+                    style={{ width: "80px", height: "60px" }}
+                />
+            </a>
+            <a href="/" className="wordmark">
+              <img 
+                  src="assets/images/cybertrick-logo-04.png" 
+                  alt="logo" 
+                  style={{ width: "250px", height: "40px" }}
+              />
+          </a>
           </div>
         </div>
 
