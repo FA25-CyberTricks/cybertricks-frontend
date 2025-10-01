@@ -21,6 +21,9 @@
   --elev: 0 18px 50px rgba(0,0,0,.35);
 }
 
+html {
+  scroll-behavior: smooth;
+}
 /* Buttons: default red, simple sizing (override sizes per-page) */
 .btn {
   display: inline-flex;
@@ -323,7 +326,7 @@ body {
 }
 
 .btn {
-  margin-left: 16px;
+  /* margin-left: 16px; */
   background: linear-gradient(180deg, var(--red), var(--red2));
   color: #fff;
   text-decoration: none;
@@ -513,17 +516,7 @@ ul.lead li { margin: .4rem 0; }
 
 .bg-gradient {
   position: fixed;
-  background: radial-gradient(
-      circle at 70% 60%, 
-      rgba(255, 0, 0, 0.8) 0%,     /* đỏ trung tâm */
-      rgba(255, 0, 0, 0.0) 40%     /* loang mờ ra ngoài */
-    ),
-    radial-gradient(
-      circle at 90% 70%, 
-      rgba(255, 255, 255, 0.4) 0%, /* ánh sáng trắng xám */
-      rgba(255, 255, 255, 0.0) 40%
-    ),
-    #000; /* nền đen */
+  background: url("../images/bg-gradient.png") center/cover no-repeat;
   min-height: 100vh;
   width: 100%;
   pointer-events: none;
@@ -654,8 +647,7 @@ ul.lead li { margin: .4rem 0; }
 .notif-card {
   position: absolute;
   top: 70px;          /* tuỳ chỉnh vị trí */
-  right: 20px;
-  width: 300px;
+  max-width: 300px;
   background: #1b1b1f !important;
   border: 1px solid var(--ring, #333);
   border-radius: 12px;
@@ -674,8 +666,28 @@ ul.lead li { margin: .4rem 0; }
   padding: 8px;
   border-bottom: 1px solid rgba(255,255,255,.1);
 }
+
 .notif-item:last-child {
   border-bottom: none;
+}
+
+.logout-btn {
+  display: block;
+  padding: 0;
+  text-align: left;
+  font-size: 16px;
+  color: var(--text);
+  background: none;   /* bỏ nền mặc định của button */
+  border: none;       /* bỏ viền */
+  outline: none;      /* bỏ viền khi focus */
+  cursor: pointer;    /* giữ dạng pointer */
+}
+
+.profile-btn {
+  display: flex;
+}
+.notif-card .profile-btn:hover {
+  background: var(--white10); /* hover mới có */
 }
 
 /* .icon-btn {

@@ -1,43 +1,97 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { User, Settings, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
+
 import "../../../assets/css/user-global.css";
 
 export default function Header() {
-  // state cho toggle notification
   const [showNotif, setShowNotif] = useState(false);
-  // state cho scroll
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  const notifRef = useRef(null);
+  const bellBtnRef = useRef(null);
+  const userMenuRef = useRef(null); // ref cho menu user
+  const { user, setUser, setAccessToken } = useAuth();
+  const navigate = useNavigate();
+
+  // hiệu ứng scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
+      setScrolled(window.scrollY > 0);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // bắt sự kiện click ngoài (cho notif + user menu)
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        showNotif &&
+        notifRef.current &&
+        !notifRef.current.contains(e.target) &&
+        bellBtnRef.current &&
+        !bellBtnRef.current.contains(e.target)
+      ) {
+        setShowNotif(false);
+      }
+
+      if (
+        showUserMenu &&
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target)
+      ) {
+        setShowUserMenu(false);
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNotif, showUserMenu]);
 
-    // cleanup khi component bị remove
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-  
+  // xử lý logout
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      setUser(null);
+      setAccessToken(null);
+      navigate("/login");
+    }
+  };
+
   return (
-    <header  className={`navbar ${scrolled ? "scrolled" : ""}`}>
+    <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="container">
         <div className="brand">
-          <span className="brand-mark">CT</span>
+          <a href="/" className="brand-mark">
+            <img
+              src="assets/images/cybertrick-logo-03.png"
+              alt="logo"
+              style={{ width: "40px", height: "30px" }}
+            />
+          </a>
         </div>
 
         <nav className="nav-links">
           <a href="/">Home</a>
           <a href="/">Optional</a>
           <a href="/">FAQ</a>
-          <a className="active" href="/">List</a>
+          <a className="active" href="/">
+            List
+          </a>
           <span className="divider"></span>
         </nav>
 
         <div className="nav-actions">
+          {/* Search */}
           <div className="search">
             <input placeholder="Search" aria-label="Search" />
             <svg className="search-icon" viewBox="0 0 24 24">
@@ -54,6 +108,7 @@ export default function Header() {
           {/* Button toggle notification */}
           <button
             className="icon-btn"
+            ref={bellBtnRef}
             onClick={() => setShowNotif(!showNotif)}
           >
             <svg viewBox="0 0 24 24">
@@ -66,6 +121,7 @@ export default function Header() {
 
           {/* Notif card */}
           <aside
+            ref={notifRef}
             className={`notif-card ${showNotif ? "active" : ""}`}
             aria-label="Latest notifications"
           >
@@ -88,21 +144,80 @@ export default function Header() {
               <strong style={{ fontSize: "18px" }}>Notification</strong>
             </div>
             <div className="notif-list">
-              <div className="notif-item">You have new voucher from CyberCore - Gaming D.C</div>
-              <div className="notif-item">You have new voucher from CyberCore - Gaming D.C</div>
-              <div className="notif-item">You have new voucher from CyberCore - Gaming D.C</div>
-              <div className="notif-item">You have new voucher from CyberCore - Gaming D.C</div>
+              <div className="notif-item">
+                You have new voucher from CyberCore - Gaming D.C
+              </div>
+              <div className="notif-item">
+                You have new voucher from CyberCore - Gaming D.C
+              </div>
+              <div className="notif-item">
+                You have new voucher from CyberCore - Gaming D.C
+              </div>
+              <div className="notif-item">
+                You have new voucher from CyberCore - Gaming D.C
+              </div>
             </div>
           </aside>
 
-          <button className="icon-btn">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5C21 16.5 17 14 12 14z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
+          {user ? (
+            <div className="user-menu" ref={userMenuRef}>
+              <button
+                className="icon-btn"
+                style={{
+                  padding: 0,
+                  border: "none",
+                  background: "transparent",
+                }}
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <img
+                  src={user.avatarUrl}
+                  alt="avatar"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+              </button>
+
+              {showUserMenu && (
+                <div className="notif-card active dropdown-menu">
+                  <div className="">
+                    <div className="notif-item">
+                      Hi {user.firstName || user.fullName}!
+                    </div>
+                    <div className="notif-item profile-btn">
+                      <User size={18} style={{ marginRight: "8px" }} />
+                      <Link to="/profile">Profile</Link>
+                    </div>
+                    <div className="notif-item profile-btn">
+                      <Settings size={18} style={{ marginRight: "8px" }} />
+                      Setting
+                    </div>
+                    <div className="notif-item profile-btn">
+                      <LogOut size={18} style={{ marginRight: "8px" }} />
+                      <button
+                        className="notif-item logout-btn"
+                        onClick={handleLogout}>
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className="icon-btn">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5C21 16.5 17 14 12 14z"
+                  fill="currentColor"
+                />
+              </svg>
+            </Link>
+          )}
         </div>
       </div>
     </header>

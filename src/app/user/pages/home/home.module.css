@@ -14,8 +14,6 @@
 .section.light{background:#f6f6f6;color:#000}
 .section .sub{font-size:28px;font-weight:600}
 .section p{font-size:20px;opacity:.9}
-.features{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:24px}
-.feature{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;text-align:center}
 .twocol{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
 .subscribe{display:flex;gap:10px}
 .subscribe input{flex:1;min-width:0;height:53px;border-radius:44.5px;border:1px solid #fff;background:var(--glass);backdrop-filter:blur(15px);padding:0 18px;color:#fff}
@@ -31,7 +29,9 @@
 .subtitle{font-size:22px}
 }}
 
-.hero {
+.hero{position:relative;isolation:isolate;padding:96px 0 56px}
+
+.section1 {
   position: relative;
   isolation: isolate;
   height: 100vh;
@@ -54,23 +54,30 @@
 
 .btn-primary{
     background-color: var(--btn-red);
-    padding: 20px 50px;
+    padding: 15px 50px;
     border: 0px !important;
     margin: 0 !important; 
+    font-size: 20px;
 }
 
 .btn-ghost{
+    border: solid 1px #fff;
     margin: 0px 5px;
-    padding: 20px 30px
+    padding: 15px 30px;
+    font-size: 20px;
 }
 
-.second-section{
-  height: 100vh;
+.section2 {
+  height:100vh;
   justify-content: end;
   align-items: flex-end;
   display: flex;
   background: url("../../../../assets/images/home-3.jpg") center/cover no-repeat !important; 
 }
+
+/* .section3 {
+  height:100vh;
+} */
 
 .right {
   justify-self: end;  /* đẩy cả block sang phải */
@@ -90,8 +97,21 @@
     display: inline;
 }
 
-.third-section .h1{
+.section4{
+    background: url("../../../../assets/images/bg-gradient.png") center/cover no-repeat;
+}
+
+.section4 .h1{
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:24px}
+.feature{
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
