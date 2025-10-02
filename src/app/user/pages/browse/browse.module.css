@@ -1,0 +1,276 @@
+.list-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  padding-bottom: 60px;
+  align-items: start; /* 👈 thay stretch bằng start */
+}
+
+.page-title {
+  font-size: 40px;
+  margin: 10px 0 12px;
+}
+
+.filters {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
+
+.filter-block {
+  margin: 14px 0 20px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ddd;
+  font-weight: 600;
+}
+
+.input-with-icon {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ring);
+  border-radius: 999px;
+  padding: 10px 12px;
+}
+
+.input-with-icon input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  padding: 8px 8px;
+}
+
+.input-with-icon svg {
+  width: 18px;
+  height: 18px;
+  color: #ddd;
+}
+
+.circle-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ring);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  color: #cfcfcf;
+}
+
+.radio input {
+  width: 16px;
+  height: 16px;
+  accent-color: #fff;
+}
+
+.results {
+  display: grid;
+  gap: 26px;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  align-items: start; /* 👈 thay stretch bằng start */
+  padding: 14px;
+  border-radius: 22px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.10), rgba(255,255,255,0.30));
+  border: 1px solid var(--ring);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+}
+
+.card > .filters {
+  align-self: start;
+}
+
+
+.thumb {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-head h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.badge {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--ring);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.address {
+  margin: 0;
+  color: #d4d4d4;
+}
+
+.price {
+  margin: 0;
+  color: #f0f0f0;
+  font-weight: 600;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+}
+
+.visited {
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  font-size: 20px;
+  color: #FFB000; /* vàng đậm hơn */
+  -webkit-text-stroke: 1px #FFB000;
+}
+
+/* Nếu vẫn muốn sao rỗng chỉ là viền vàng */
+.stars .off {
+  color: transparent;
+  -webkit-text-stroke: 1px #FFB000;
+}
+
+
+.wordmark {
+  font-family: Orbitron, Inter, sans-serif;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+/* --------- Responsive --------- */
+@media (max-width: 1000px) {
+  .list-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .search {
+    display: none;
+  }
+
+  .card {
+    grid-template-columns: 1fr;
+  }
+
+  .thumb {
+    height: 180px;
+  }
+
+  .stars {
+    margin-left: 0;
+  }
+}
+
+/* View more -> đỏ brand, không viền */
+.card .btn {
+  background: var(--btn-red);
+  color: #fff;
+  border: none;                 /* không dùng border */
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(216,14,14,.25);
+  transition: background .2s ease, transform .05s ease;
+}
+.card .btn:hover { background: var(--btn-red2); }
+.card .btn:active { transform: translateY(1px); }
+
+/* Text status thay cho badge */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e6e6e6;          /* màu chữ mặc định, sẽ override theo trạng thái */
+}
+
+/* chấm tròn trước chữ */
+.status .dot {
+  margin-left: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor; /* ăn theo màu của .status */
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 22%, transparent);
+}
+
+/* Các biến thể trạng thái (ví dụ) */
+.status.is-online { color: #22c55e; }  /* xanh: đang hoạt động */
+.status.is-hot    { color: #ef4444; }  /* đỏ: đang hot */
+.status.is-closed { color: #111111; }  /* đen: đóng cửa */
+.status.is-temp   { color: #f59e0b; }  /* vàng: tạm thời đóng cửa */
+
+/* Wrapper scale: thu nhỏ đều cả chiều ngang lẫn dọc */
+.scale-wrap{
+  --s: 1;                         /* mặc định PC */
+  transform: scale(var(--s));
+  transform-origin: top left;     /* giống bạn: left (mình thêm top cho dễ căn) */
+
+  /* rất quan trọng: bù lại chiều ngang để không bị “tụt” width */
+  width: calc(100% / var(--s));
+}
+
+/* Mobile: tự chọn tỉ lệ */
+@media (max-width: 560px){
+  .scale-wrap{ --s: .9; }         /* 90% */
+}
+@media (max-width: 420px){
+  .scale-wrap{ --s: .65; }        /* 85% */
+}
+@media (max-width: 360px){
+  .scale-wrap{ --s: .4; }         /* 80% */
+}
+
+@media (max-width: 1080px) {
+  .status .status-label { display: none; }  /* ẩn chữ, vẫn giữ dot */
+}

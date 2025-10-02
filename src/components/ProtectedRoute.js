@@ -1,26 +1,23 @@
-import React from "react";
+// ProtectedRoute.jsx
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/**
- * ProtectedRoute
- * @param {children} component con (page thật sự cần bảo vệ)
- * @param {roles} optional - mảng roles được phép (["Admin", "User"])
- */
-export default function ProtectedRoute({ children, roles }) {
-  const { user } = useAuth();      // user lấy từ AuthContext
-  const location = useLocation();  // path hiện tại để redirect lại sau login
+export default function ProtectedRoute({ children }) {
+  const { loading, user, accessToken } = useAuth();
+  const location = useLocation();
 
-  // ❌ Nếu chưa login → redirect về login, kèm returnUrl
-  if (!user) {
-    return <Navigate to={`/login?returnUrl=${location.pathname}`} replace />;
+  // 1) Đang bootstrap/refresh -> chưa biết trạng thái => chờ
+  if (loading) {
+    return <div style={{ padding: 40 }}>Đang kiểm tra phiên đăng nhập…</div>;
   }
 
-  // ❌ Nếu có yêu cầu role mà user không có → redirect về trang báo lỗi
-  if (roles && !roles.some(r => user.roles?.includes(r))) {
-    return <Navigate to="/unauthorized" replace />;
+  // 2) Đã biết chắc chắn: nếu chưa đăng nhập -> về login kèm returnUrl
+  const isAuthenticated = !!accessToken && !!user;
+  if (!isAuthenticated) {
+    const search = new URLSearchParams({ returnUrl: location.pathname + location.search }).toString();
+    return <Navigate to={`/login?${search}`} replace />;
   }
 
-  // ✅ Nếu pass hết → render trang thật
+  // 3) Hợp lệ -> render content
   return children;
 }

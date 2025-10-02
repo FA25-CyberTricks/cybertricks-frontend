@@ -11,7 +11,7 @@ export default function Home() {
 
       <main>
         {/* HERO */}
-        <section className={`${styles.hero} ${styles.section1}`}>
+        <section className={`${styles.hero} ${styles.section1}`} id="start">
           <div className={`${styles.blob} ${styles["red-left"]}`} />
           <div className={`${styles.blob} ${styles["red-right"]}`} />
 
@@ -181,7 +181,7 @@ export default function Home() {
         </section>
 
         {/* Why use */}
-        <section className={`${styles.section} ${styles.section4}`}>
+        <section className={`${styles.section} ${styles.section4}`} id="team">
           <div className="container">
             <h3
               className={styles.h1}

@@ -1,0 +1,287 @@
+.page-title {
+  font-size: 32px;
+  margin: 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payment .grid {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 26px;
+  align-items: start;
+}
+
+.ticket {
+  background: #e9e9e9;
+  color: #111;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, .12);
+  padding: 14px 16px;
+}
+.ticket h3 {
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: #111;
+}
+.ticket h2 {
+  margin: 6px 0;
+  color: #111;
+}
+.ticket .addr {
+  margin: 0 0 10px;
+  color: #333;
+}
+.ticket .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px 26px;
+  margin: 8px 0;
+}
+.ticket hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, .3);
+  margin: 12px 0;
+}
+
+.summary {
+  background: linear-gradient(90deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .4));
+  border: 1px solid var(--ring);
+  border-radius: 16px;
+  padding: 16px;
+  color: #fff;
+}
+.summary h3 {
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.lines li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #e6e6e6;
+}
+.lines li.sep {
+  height: 1px;
+  background: rgba(255, 255, 255, .15);
+  margin: 4px 0;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  font-size: 18px;
+  margin: 10px 0;
+}
+.total span {
+  font-size: 20px;
+}
+
+.pm {
+  margin: 8px 0 14px;
+  color: #ddd;
+}
+
+.radio { margin-left: 8px; }
+
+.success {
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  min-height: 280px;
+}
+.done-icon svg {
+  width: 130px;
+  height: 130px;
+}
+.done {
+  font-size: 32px;
+  margin: 0;
+}
+
+.wordmark {
+  font-family: Orbitron, Inter, sans-serif;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 1000px) {
+  .payment .grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .search { display: none; }
+}
+
+.ticket .row {
+  display: grid;      /* dùng grid thay vì flex */
+  gap: 6px;           /* khoảng cách giữa các dòng */
+}
+.ticket .row div {
+  display: flex;
+  gap: 6px;
+}
+.ticket .row strong {
+  font-weight: 600;   /* chữ đậm */
+  min-width: 80px;    /* canh đều cột nhãn */
+  display: inline-block;
+}
+
+.payment .grid {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 26px;
+  align-items: stretch; /* <-- quan trọng: kéo item cao bằng nhau */
+}
+
+/* 2) Đảm bảo mỗi item tự giãn đầy chiều cao khu vực grid */
+/* .payment .grid > .ticket,
+.payment .grid > .summary {
+  height: 100%;
+} */
+
+/* (không bắt buộc) nếu muốn nội dung trong summary xếp dọc gọn gàng */
+.summary {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ticket và Summary: bo góc giống nhau */
+.payment .grid > .ticket,
+.payment .grid > .summary {
+  border-radius: 16px; 
+}
+
+/* Nút Pay căn giữa ngang, màu đỏ */
+.summary .btn.red {
+  display: block;         /* chiếm cả dòng */
+  margin: 16px auto 0;    /* căn giữa ngang */
+  text-align: center;
+  background: #d80e0e;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.summary .btn.red:hover {
+  background: #b90b0b;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* đẩy phần cuối xuống */
+  background: linear-gradient(90deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .4));
+  border: 1px solid var(--ring);
+  border-radius: 16px;
+  padding: 16px;
+  color: #fff;
+}
+
+/* phần nội dung chính phía trên */
+.summary .lines,
+.summary .total,
+.summary .pm {
+  margin-bottom: 12px;
+}
+
+@media (max-width: 1000px) {
+  .payment .grid {
+    grid-template-columns: 1fr;   /* 1 cột */
+    align-items: start;            /* bỏ stretch theo chiều dọc */
+  }
+
+  /* Bỏ height:100% để không ép bằng nhau */
+  /* .payment .grid > .ticket,
+  .payment .grid > .summary {
+    height: auto;
+  } */
+
+  /* (Tuỳ chọn) Đảm bảo thứ tự: ticket trước, summary sau */
+  .ticket { order: 1; }
+  .summary { order: 2; }
+
+  /* (Tuỳ chọn) Nút Pay full width hơn trên mobile */
+  .summary .btn.red.wide {
+    width: 100%;
+    max-width: 480px;    /* giới hạn cho đẹp */
+  }
+}
+/* Khung tổng: div ở giữa + nút dưới sát đáy */
+.summary.success {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;           /* hoặc theo ý bạn */
+  padding: 16px;               /* giữ padding có sẵn của .summary */
+}
+
+/* Khối ở giữa: chiếm khoảng trống giữa top và nút, và center nội dung */
+.success-body {
+  flex: 1;                     /* giãn chiếm hết không gian còn lại */
+  display: flex;
+  flex-direction: column;
+  align-items: center;         /* căn giữa ngang */
+  justify-content: center;     /* căn giữa dọc */
+  gap: 14px;
+}
+
+/* Icon giữa đẹp */
+.done-icon {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 150px;
+}
+.done-icon svg {
+  width: 130px;
+  height: 130px;
+}
+
+/* Nút dưới tì sát đáy, full width nếu cần */
+.summary.success .btn.red.wide {
+  align-self: stretch;         /* full bề ngang trong aside */
+  margin-top: 16px;            /* tách nhẹ với khối giữa */
+  border: none;                /* xoá viền nếu global có */
+}
+
+/* Icon luôn ở giữa khung của nó */
+.done-icon {
+  display: grid;
+  place-items: center;     /* cả ngang & dọc */
+  width: 150px;            /* tuỳ chỉnh */
+  height: 150px;
+}
+.done-icon svg {
+  width: 130px;
+  height: 130px;
+}
+
+/* Xoá viền đen của nút (override mọi nơi) */
+.btn,
+.btn.red,
+.summary .btn.red {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Giữ style đỏ + hover nếu cần */
+.summary .btn.red {
+  background: #d80e0e;
+  color: #fff;
+  border-radius: 16px;
+  padding: 12px 20px;
+}
+.summary .btn.red:hover { background: #b90b0b; }
