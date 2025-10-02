@@ -11,14 +11,14 @@ export default function Footer() {
           <div className="ft-logo">
              <a href="/" className="brand-mark">
                 <img 
-                    src="assets/images/cybertrick-logo-03.png" 
+                    src="/assets/images/cybertrick-logo-03.png" 
                     alt="logo" 
                     style={{ width: "80px", height: "60px" }}
                 />
             </a>
             <a href="/" className="wordmark">
               <img 
-                  src="assets/images/cybertrick-logo-04.png" 
+                  src="/assets/images/cybertrick-logo-04.png" 
                   alt="logo" 
                   style={{ width: "250px", height: "40px" }}
               />

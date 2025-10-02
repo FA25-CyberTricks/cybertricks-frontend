@@ -1,0 +1,930 @@
+/* ===== Page scope: biến chỉ áp dụng trong trang Detail ===== */
+.page {
+  /* Brand tokens bạn đã có:
+     --btn-red, --btn-red2, --ring, --glass, --border, --brand, --green, --purple ...
+  */
+
+  /* Ghế: bảng màu đề xuất */
+  --seat-available-bg: #ffffff; /* trắng: trống */
+  --seat-available-fg: #000000;
+
+  --seat-selected-bg: #00FF00; /* xanh lá: bạn đang chọn */
+  --seat-selected-fg: #0b1d0f;
+
+  --seat-reserved-bg: #ffa200; /* vàng: người khác đang hold tạm thời */
+  --seat-reserved-fg: #1a1304;
+
+  --seat-occupied-bg: #FF0000; /* đỏ: đã có người/đã đặt */
+  --seat-occupied-fg: #2a0a0a;
+
+  --seat-maintenance-bg: #9ca3af; /* xám: bảo trì/khoá */
+  --seat-maintenance-fg: #0d0f12;
+
+  --seat-event-bg: #a855f7; /* tím: ghế sự kiện/đặc biệt */
+  --seat-event-fg: #120a1d;
+
+  /* Timebar */
+  --timebar-range-bg: var(--green);
+  --timebar-start-bg: var(--green);
+  --timebar-end-bg: var(--brand);
+}
+
+/* ===== Hero ===== */
+.hero {
+  position: relative;
+  min-height: 520px;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  z-index: -2;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.75) 41%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  z-index: -1;
+}
+.hero-inner {
+  width: 100%;
+  max-width: 1200px;
+  padding: 96px 24px 56px;
+}
+.hero h1 {
+  font-size: 60px;
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+.hero p {
+  max-width: 940px;
+  font-size: 20px;
+  text-shadow: 0 0 3px #000;
+}
+
+/* ===== Panels & Cards ===== */
+.panel {
+  background: var(--glass);
+  border: 1px solid #fff;
+  border-radius: 32px;
+  margin-top:  -100px;
+  backdrop-filter: blur(15px);
+  padding: 24px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 24px;
+}
+.card {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+.card.white {
+  background: #fff;
+  color: #000;
+}
+.kvs {
+  display: grid;
+  gap: 10px;
+}
+
+/* ===== Booking ===== */
+.booking {
+  margin-top: 40px;
+  margin-bottom: 150px;
+  padding: 20px 36px;
+  border-radius: 22px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.3)
+  );
+}
+.booking h2 {
+  font-size: 48px;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+  text-align: center;
+}
+.date-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0;
+  width: 100%;
+}
+.pill {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  border-radius: 18px;
+  border: 1px solid #fff;
+  background: #000;
+  box-shadow: 0 0 21px rgba(255, 255, 255, 0.11);
+}
+.pill .label {
+  font-weight: 600;
+}
+
+.select {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  padding: 0px 20px;
+  justify-content: center;
+  border-radius: 12px;
+  background: #fff;
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+}
+.pickers-inline {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+
+.legend {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.swatch {
+  width: 24px;
+  height: 20px;
+}
+
+/* ===== Timebar ===== */
+.timebar-wrap {
+  margin-top: 16px;
+}
+.timebar-scroll {
+  overflow: auto;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+}
+.timebar-track {
+  position: relative;
+  min-width: 100%;
+  height: 200px !important;
+}
+
+.timebar-range {
+  position: absolute;
+  top: 12px;
+  background: var(--timebar-range-bg);
+  opacity: 0.25;
+  border-radius: 8px;
+  pointer-events: none;
+  height: 48px;
+}
+
+.timebar-ticks {
+  position: absolute;
+  inset: 0;
+}
+.timebar-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-1px);
+}
+.timebar-tick-line {
+  display: block;
+  width: 2px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.timebar-tick-label {
+  position: absolute;
+  top: 44px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.timebar-handle {
+  position: absolute;
+  top: 8px;
+  transform: translateX(-50%);
+  height: calc(100% - 16px);
+  width: 14px;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: grab;
+}
+.timebar-handle:active {
+  cursor: grabbing;
+}
+.timebar-handle span {
+  position: absolute;
+  bottom: -26px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--ring);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.timebar-handle.start {
+  background: var(--timebar-start-bg);
+}
+.timebar-handle.end {
+  background: var(--timebar-end-bg);
+}
+
+.timebar-footer {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 8px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* ===== Chooser ===== */
+.chooser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-top: 18px;
+}
+.chooser .bar {
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  height: 87px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+}
+.field {
+  display: grid;
+  gap: 8px;
+}
+.field label {
+  font-weight: 700;
+  font-size: 14px;
+}
+.field select {
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #000;
+  color: #fff;
+  padding: 0 12px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.15) inset;
+}
+
+/* ===== Rooms ===== */
+.rooms {
+  margin-top: 24px;
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #333;
+  width: 100%;
+  max-width: 1200px;
+  overflow: auto;
+  box-sizing: border-box;
+}
+.room-grid {
+  width: 1100px;
+  min-width: 1100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+.grid-box {
+  border: 1px solid #555;
+  padding: 12px;
+  border-radius: 10px;
+}
+.room {
+  padding-right: 20px;
+}
+
+/* ===== Seats ===== */
+.seat-grid {
+  --size: 44px;
+  --gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 10), var(--size));
+  grid-auto-rows: var(--size);
+  gap: var(--gap);
+  justify-content: start;
+  padding-right: 5px;
+}
+.seat {
+  border: 2.5px solid #000;
+  border-radius: 6px;
+  background: var(--seat-available-bg);
+  color: var(--seat-available-fg);
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  position: relative;
+  user-select: none;
+  transition: background 0.15s ease, box-shadow 0.15s ease,
+    transform 0.02s linear, opacity 0.15s ease;
+}
+.seat::after {
+  content: attr(data-code);
+  font: 700 12px/1.1 system-ui, sans-serif;
+  letter-spacing: 0.2px;
+}
+
+/* hover (desktop only) */
+/* @media (hover: hover) {
+  .seat:hover {
+    background: #f5f5f5;
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.08);
+  }
+} */
+
+/* Status modifiers */
+.seat--selected {
+  background: var(--seat-selected-bg);
+  color: var(--seat-selected-fg);
+  border-color: transparent;
+}
+.seat--reserved {
+  background: var(--seat-reserved-bg);
+  color: var(--seat-reserved-fg);
+}
+.seat--occupied {
+  background: var(--seat-occupied-bg);
+  color: var(--seat-occupied-fg);
+}
+.seat--maintenance {
+  background: var(--seat-maintenance-bg);
+  color: var(--seat-maintenance-fg);
+  opacity: 0.65;
+}
+.seat--event {
+  background: var(--seat-event-bg);
+  color: var(--seat-event-fg);
+}
+
+/* ===== Food ===== */
+.food {
+  margin-top: 40px;
+}
+.food h3 {
+  font-size: 48px;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0 0 18px;
+}
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+}
+.food-card {
+  background: #000;
+  border: 1px solid #fff;
+  border-radius: 12px;
+  padding: 12px;
+}
+.qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chip {
+  width: 28px;
+  height: 28px;
+  background: #d9d9d9;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  color: #000;
+  font-weight: 700;
+}
+.muted {
+  opacity: 0.8;
+}
+
+/* ===== Feedback ===== */
+.feedback {
+  margin-top: 40px;
+}
+.review-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.review-card {
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.avatar-round {
+  width: 79px;
+  height: 79px;
+  border-radius: 999px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+.stars {
+  display: flex;
+  gap: 8px;
+}
+.star {
+  width: 45px;
+  height: 43px;
+  background: #fff;
+  border: none;
+}
+.hollow {
+  background: transparent;
+  border: 3px solid #fff;
+}
+.comment {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.comment input {
+  flex: 1;
+  height: 64px;
+  border-radius: 21px;
+  border: 1px solid #fff;
+  background: var(--glass);
+  backdrop-filter: blur(15px);
+  padding: 0 18px;
+  color: #fff;
+  font-size: 18px;
+}
+.send {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  background: var(--glass);
+}
+
+/* ===== Buttons (reused) ===== */
+.btn {
+  background: #1a1a1a;
+  border: 1px solid var(--ring);
+  color: #fff;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-weight: 600;
+}
+.primary {
+  background: var(--btn-red);
+  border: none;
+  box-shadow: 0 10px 24px rgba(216, 14, 14, 0.25);
+}
+.primary:hover {
+  background:  var(--btn-red2);
+}
+
+/* ===== Datepicker ===== */
+.datepicker {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.dp-panel {
+  width: min(420px, 100%);
+  background: #0b0b0b;
+  color: #fff;
+  border: 1px solid var(--ring);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  padding: 14px;
+}
+.dp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.dp-title {
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+.dp-nav {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid var(--ring);
+  background: #121212;
+  color: #fff;
+  font-size: 20px;
+}
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.dp-week {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.dp-days button {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+}
+.dp-days button:hover {
+  filter: brightness(1.15);
+}
+.out {
+  opacity: 0.45;
+}
+.today {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+}
+.selected {
+  background: var(--btn-red) !important;
+  border-color: transparent !important;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(216, 14, 14, 0.25);
+}
+.dp-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+.dp-foot .btn {
+  background: #1a1a1a;
+  border: 1px solid var(--ring);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+.dp-today {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #fff !important;
+}
+
+/* ===== Scrollbar ===== */
+.scrollbar-slim {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+.scrollbar-slim::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.scrollbar-slim::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-slim::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+}
+.scrollbar-slim::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* —— Date row (final tweaks) —— */
+.pill-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding: 0 16px;
+  background: var(--btn-red);
+  border: 1px solid var(--ring);
+  border-radius: 16px;
+  width: 170px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+}
+.pill-info .pill-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.pill-info .label {
+  font-weight: 700;
+}
+.pill-info .muted {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+.select.block {
+  height: 64px;
+  border-radius: 12px;
+  background: #fff;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+.select.block .value {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.5px;
+}
+.select.block small {
+  opacity: 0.7;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 1200px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .food-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .review-row {
+    grid-template-columns: 1fr;
+  }
+  .room-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .date-row {
+    grid-template-columns: 1fr;
+  }
+  .chooser {
+    grid-template-columns: 1fr;
+  }
+  .food h3,
+  .booking h2 {
+    font-size: 32px;
+  }
+  .hero h1 {
+    font-size: 40px;
+  }
+  .pill-info,
+  .select.block {
+    height: 58px;
+  }
+  .select.block .value {
+    font-size: 20px;
+  }
+}
+@media (max-width: 480px) {
+  .dp-panel {
+    padding: 12px;
+  }
+  .dp-days button {
+    height: 40px;
+  }
+}
+
+/* ===== Timebar (global vì JSX dùng class string) ===== */
+:global(.timebar-wrap) {
+  margin-top: 16px;
+}
+
+:global(.timebar-scroll) {
+  overflow: auto;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+}
+
+:global(.timebar-track) {
+  position: relative;
+  min-width: 100%;
+  height: 96px; /* 64px track + label */
+}
+
+/* Vùng range đã chọn */
+:global(.timebar-range) {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  height: 48px;
+  background: var(--timebar-range-bg, #22c55e);
+  opacity: 0.25;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* Vạch giờ */
+:global(.timebar-ticks) {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+:global(.timebar-tick) {
+  position: absolute;
+  top: 0;
+  transform: translateX(-1px);
+}
+:global(.timebar-tick-line) {
+  display: block;
+  width: 2px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+}
+:global(.timebar-tick-label) {
+  position: absolute;
+  top: 44px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+/* Nút kéo (handles) */
+:global(.timebar-handle) {
+  position: absolute;
+  top: 8px;
+  transform: translateX(-50%);
+  height: calc(100% - 16px);
+  width: 14px;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: grab;
+  outline: none;
+}
+:global(.timebar-handle:active) {
+  cursor: grabbing;
+}
+
+:global(.timebar-handle span) {
+  position: absolute;
+  bottom: -26px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--ring, rgba(255, 255, 255, 0.2));
+  padding: 2px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Màu 2 đầu handle (có fallback nếu chưa set CSS var) */
+:global(.timebar-handle.start) {
+  background: var(--timebar-start-bg, #22c55e);
+}
+:global(.timebar-handle.end) {
+  background: var(--timebar-end-bg, #ef4444);
+}
+
+/* Footer nhỏ dưới thanh */
+:global(.timebar-footer) {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Slim scrollbar (global để dùng được với class string) */
+:global(.scrollbar-slim) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+:global(.scrollbar-slim::-webkit-scrollbar) {
+  height: 6px;
+  width: 6px;
+}
+:global(.scrollbar-slim::-webkit-scrollbar-track) {
+  background: transparent;
+}
+:global(.scrollbar-slim::-webkit-scrollbar-thumb) {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+}
+:global(.scrollbar-slim::-webkit-scrollbar-thumb:hover) {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.inlineRow{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;     /* hẹp thì tự xuống hàng gọn gàng */
+}
+
+.legendInline{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dateRowCenter{
+  display: flex;
+  justify-content: center;  /* căn giữa ngang */
+  width: 100%;
+}
+
+.date-row{
+  max-width: 920px;         /* tuỳ chỉnh bề rộng tối đa */
+  width: 100%;
+}
+
+/* Hero base giữ nguyên */
+.hero {
+  position: relative;
+  height: 80vh;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+/* BỎ .hero::before cũ đi */
+
+/* Overlay gradient vẫn giữ */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.75) 41%, rgba(0,0,0,0) 100%);
+  z-index: -1;
+}
+
+/* Slideshow layer */
+.heroBg {
+  position: absolute;
+  inset: 0;
+  z-index: -2; /* dưới overlay gradient */
+  overflow: hidden;
+}
+
+/* Mỗi slide là 1 span phủ full */
+.heroBg > span {
+  position: absolute;
+  inset: 0;
+  background: var(--bg) center/cover no-repeat;
+  opacity: 0;
+  animation: heroFade 18s infinite;
+  will-change: opacity;
+}
+
+/* Delay để các slide lần lượt xuất hiện (3 ảnh ⇒ mỗi ảnh lệch 6s) */
+.heroBg > span:nth-child(1) { animation-delay: 0s; }
+.heroBg > span:nth-child(2) { animation-delay: 6s; }
+.heroBg > span:nth-child(3) { animation-delay: 12s; }
+
+/* Cross-fade mềm: 6% vào, 28% giữ, 34% ra */
+@keyframes heroFade {
+  0%   { opacity: 0; }
+  6%   { opacity: 1; }
+  28%  { opacity: 1; }
+  34%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Phần còn lại của hero giữ nguyên */
+.hero-inner { width: 100%; max-width: 1200px; padding: 96px 24px 56px; }
+.hero h1 { font-size: 60px; margin: 0 0 10px; font-weight: 700; }
+.hero p { max-width: 940px; font-size: 20px; text-shadow: 0 0 3px #000; }

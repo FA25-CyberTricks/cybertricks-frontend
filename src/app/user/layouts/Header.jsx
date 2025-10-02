@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { User, Settings, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
+import { HashLink } from "react-router-hash-link";
 
 import "../../../assets/css/user-global.css";
 
@@ -9,6 +10,7 @@ export default function Header() {
   const [showNotif, setShowNotif] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [headerSearch, setHeaderSearch] = useState(""); // 👈 search ở header
 
   const notifRef = useRef(null);
   const bellBtnRef = useRef(null);
@@ -67,13 +69,23 @@ export default function Header() {
     }
   };
 
+  // === Header search handlers ===
+  const doHeaderSearch = () => {
+    const q = (headerSearch || "").trim();
+    // điều hướng sang Browse kèm query param q
+    navigate(q.length ? `/browse?q=${encodeURIComponent(q)}` : "/browse");
+  };
+  const onHeaderSearchKeyDown = (e) => {
+    if (e.key === "Enter") doHeaderSearch();
+  };
+
   return (
     <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="container">
         <div className="brand">
           <a href="/" className="brand-mark">
             <img
-              src="assets/images/cybertrick-logo-03.png"
+              src="/assets/images/cybertrick-logo-03.png"
               alt="logo"
               style={{ width: "40px", height: "30px" }}
             />
@@ -81,28 +93,50 @@ export default function Header() {
         </div>
 
         <nav className="nav-links">
-          <a href="/">Home</a>
-          <a href="/">Optional</a>
-          <a href="/">FAQ</a>
-          <a className="active" href="/">
-            List
-          </a>
+          <HashLink smooth to="/#start">
+            Home
+          </HashLink>
+          <Link to="/browse">Browse</Link>
+          <HashLink smooth to="/faq#faq">
+            FAQ
+          </HashLink>
+          <HashLink smooth to="/#team">
+            Other
+          </HashLink>
           <span className="divider"></span>
         </nav>
 
         <div className="nav-actions">
           {/* Search */}
           <div className="search">
-            <input placeholder="Search" aria-label="Search" />
-            <svg className="search-icon" viewBox="0 0 24 24">
-              <path
-                d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
+            <input
+              placeholder="Search"
+              aria-label="Search"
+              value={headerSearch}
+              onChange={(e) => setHeaderSearch(e.target.value)}
+              onKeyDown={onHeaderSearchKeyDown}
+            />
+            <button
+              className="search-icon"
+              aria-label="Search"
+              onClick={doHeaderSearch}
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+              }}
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
           </div>
 
           {/* Button toggle notification */}
@@ -189,18 +223,21 @@ export default function Header() {
                       Hi {user.firstName || user.fullName}!
                     </div>
                     <div className="notif-item profile-btn">
-                      <User size={18} style={{ marginRight: "8px" }} />
-                      <Link to="/profile">Profile</Link>
+                      <Link to="/profile">
+                        <User size={18} style={{ marginRight: "8px" }} />
+                        Profile
+                      </Link>
                     </div>
                     <div className="notif-item profile-btn">
                       <Settings size={18} style={{ marginRight: "8px" }} />
                       Setting
                     </div>
                     <div className="notif-item profile-btn">
-                      <LogOut size={18} style={{ marginRight: "8px" }} />
                       <button
                         className="notif-item logout-btn"
-                        onClick={handleLogout}>
+                        onClick={handleLogout}
+                      >
+                        <LogOut size={18} style={{ marginRight: "8px" }} />
                         Logout
                       </button>
                     </div>

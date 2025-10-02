@@ -11,10 +11,11 @@ import PasswordField from "./PasswordField";
 import "../../../../assets/css/user-global.css";
 import styles from "./login.module.css";
 
-
 export default function Login() {
   const navigate = useNavigate();
   const { setAccessToken, setUser } = useAuth(); // lấy setter
+
+  const params = new URLSearchParams(window.location.search);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -41,6 +42,7 @@ export default function Login() {
           email: formData.email,
           password: formData.password,
           remember: formData.remember,
+          returnUrl: params.get("returnUrl") || "/",
         }),
         credentials: "include",
       });
@@ -71,37 +73,64 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      // gọi endpoint login google (redirect flow)
-      const res = await fetch("/api/auth/google-login", {
-        method: "GET",
-        credentials: "include", // để cookie refreshToken về FE
-      });
+  const FE_ORIGIN = window.location.origin;
+  const BE_ORIGIN = "https://localhost:7229";
+  const BE_ORIGIN_ONLY = new URL(BE_ORIGIN).origin;
 
-      if (!res.ok) {
-        toast.error("Google login failed!");
-        return;
-      }
+  const handleGoogleLogin = () => {
+    const returnUrl =
+      new URLSearchParams(window.location.search).get("returnUrl") || "/";
 
-      const data = await res.json();
+    const width = 500,
+      height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
 
-      if (data.token) {
-        setAccessToken(data.token);
-      }
-      if (data.user) {
-        setUser(data.user);
-      }
+    const url =
+      `${BE_ORIGIN}/api/auth/google-login` +
+      `?returnUrl=${encodeURIComponent(returnUrl)}` +
+      `&opener=${encodeURIComponent(FE_ORIGIN)}`;
 
-      toast.success("Google login success!");
+    const popup = window.open(
+      url,
+      "googleLogin",
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
 
-      setTimeout(() => {
-        navigate(data.returnUrl || "/");
-      }, 100);
-    } catch (err) {
-      console.error("Google login error:", err);
-      toast.error("Something went wrong, please try again!");
+    if (!popup) {
+      toast.error("Popup bị chặn. Hãy cho phép popup cho trang này.");
+      return;
     }
+
+    function onMessage(e) {
+      if (e.origin !== BE_ORIGIN_ONLY) return; // chặn cross-origin
+      if (e.source !== popup) return; // chỉ nhận đúng popup
+
+      try {
+        const data = e.data;
+        if (data && data.token) {
+          setAccessToken(data.token);
+          if (data.user) setUser(data.user);
+          toast.success("Google login success!");
+          navigate(data.returnUrl || "/");
+        } else if (data && data.error) {
+          toast.error("Google login failed: " + data.error);
+        }
+      } finally {
+        window.removeEventListener("message", onMessage);
+        if (popup && !popup.closed) popup.close();
+      }
+    }
+
+    window.addEventListener("message", onMessage, { once: true });
+
+    // Tuỳ chọn: dọn dẹp khi user tự đóng popup
+    const timer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(timer);
+        window.removeEventListener("message", onMessage);
+      }
+    }, 500);
   };
 
   return (
@@ -153,9 +182,11 @@ export default function Login() {
             Sign in
           </button>
 
-          <button className={styles["btn-google"]} 
-                  type="button"
-                  onClick={handleGoogleLogin}>
+          <button
+            className={styles["btn-google"]}
+            type="button"
+            onClick={handleGoogleLogin}
+          >
             <img
               src="assets/images/google-logo.png"
               alt="Google"
