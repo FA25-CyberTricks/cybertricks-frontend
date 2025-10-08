@@ -96,8 +96,8 @@ export default function Header() {
           <HashLink smooth to="/#start">
             Home
           </HashLink>
-          <Link to="/browse">Browse</Link>
-          <HashLink smooth to="/faq#faq">
+          <Link to="/browse">Cyber Cafés</Link>
+          <HashLink smooth to="/faq">
             FAQ
           </HashLink>
           <HashLink smooth to="/#team">

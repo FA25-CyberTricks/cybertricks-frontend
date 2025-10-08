@@ -39,6 +39,7 @@ function normalizeDto(dto) {
     address: dto?.address ?? dto?.Address,
     contactPhone: dto?.contactPhone ?? dto?.ContactPhone,
     latitude: dto?.latitude ?? dto?.Latitude,
+    visited: dto?.visited ?? dto?.Visited,
     avatar: dto?.avatar ?? dto?.Avatar ?? null,
   };
 }
@@ -53,7 +54,7 @@ function mapStoreDtoToCard(dto, idx) {
     statusText: "Đang hoạt động",
     address: dto.address ?? "Đang cập nhật địa chỉ",
     price: "10 – 12.000 VND / 1 Hour",
-    visited: "~ 0 visited",
+    visited: `${dto.visited} visited`,
     stars: 4,
     latitude: dto.latitude,
   };
