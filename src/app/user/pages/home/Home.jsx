@@ -37,7 +37,7 @@ export default function Home() {
                 <a className={`btn ${styles["btn-primary"]}`} href="#start">
                   Start Booking
                 </a>
-                <a className={`btn ${styles["btn-ghost"]}`} href="#more">
+                <a className={`btn ${styles["btn-ghost"]}`} href="/browse">
                   More
                 </a>
               </div>
