@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 
-import Header from "../../layouts/header";
+import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import styles from "./browse.module.css";

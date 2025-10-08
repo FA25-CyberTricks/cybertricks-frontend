@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import Header from "../../layouts/header";
+import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import styles from "./profile.module.css";

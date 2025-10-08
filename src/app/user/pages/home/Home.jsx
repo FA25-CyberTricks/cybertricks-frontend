@@ -1,4 +1,4 @@
-import Header from "../../layouts/header";
+import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import "../../../../assets/css/user-global.css";
