@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // 👈 lấy shopId từ URL
-import Header from "../../layouts/header";
+import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import useDragScroll from "../detail/hook/useDragScroll";

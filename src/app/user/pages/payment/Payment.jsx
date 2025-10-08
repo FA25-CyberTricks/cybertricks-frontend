@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"; // ✅ toast
-import Header from "../../layouts/header";
+import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import styles from "./payment.module.css";

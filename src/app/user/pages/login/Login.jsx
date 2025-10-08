@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 import { useAuth } from "../../../../context/AuthContext";
 
-import Header from "../../layouts/header";
+import Header from "../../layouts/Header";
 import PasswordField from "./PasswordField";
 
 import "../../../../assets/css/user-global.css";
