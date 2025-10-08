@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const refreshToken = async () => {
       try {
-        const res = await fetch("/api/auth/refresh", {
+        const res = await fetch("https://localhost:7229/api/auth/refresh", {
           method: "POST",
           credentials: "include", // 👈 để browser gửi kèm cookie HttpOnly
         });

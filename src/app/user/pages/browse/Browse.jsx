@@ -85,7 +85,7 @@ export default function ListPage() {
   async function fetchAll() {
     setLoading(true);
     try {
-      const res = await fetch("/api/Store/GetAll/all", { cache: "no-store" }); // ✅ sửa endpoint
+      const res = await fetch("https://localhost:7229/api/Store/GetAll/all", { cache: "no-store" }); // ✅ sửa endpoint
       const json = await res.json();
       const arr = Array.isArray(json?.data) ? json.data : [];
       setItems(arr.map((dto, i) => mapStoreDtoToCard(normalizeDto(dto), i)));

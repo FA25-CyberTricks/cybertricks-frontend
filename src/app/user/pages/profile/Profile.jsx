@@ -69,7 +69,7 @@ export default function Profile() {
 
     const ensureToken = async () => {
       try {
-        const res = await fetch("/api/auth/refresh", {
+        const res = await fetch("https://localhost:7229/api/auth/refresh", {
           method: "POST",
           credentials: "include",
         });
@@ -114,7 +114,7 @@ export default function Profile() {
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        const res = await fetch("/api/profile/me", {
+        const res = await fetch("https://localhost:7229/api/profile/me", {
           method: "GET",
           headers: jsonHeaders,
           signal: controller.signal,
@@ -219,7 +219,7 @@ export default function Profile() {
         formData.append("avatarFile", selectedFile);
       }
 
-      const res = await fetch("/api/profile/update", {
+      const res = await fetch("https://localhost:7229/api/profile/update", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`, // không set Content-Type ở multipart
@@ -243,7 +243,7 @@ export default function Profile() {
         setSelectedFile(null);
       } else {
         // fallback: gọi lại /me
-        const refresh = await fetch("/api/profile/me", {
+        const refresh = await fetch("https://localhost:7229/api/profile/me", {
           method: "GET",
           headers: jsonHeaders,
         });
@@ -284,7 +284,7 @@ export default function Profile() {
 
     try {
       setChangingPw(true);
-      const res = await fetch("/api/profile/change-password", {
+      const res = await fetch("https://localhost:7229/api/profile/change-password", {
         method: "POST",
         headers: jsonHeaders,
         body: JSON.stringify({
