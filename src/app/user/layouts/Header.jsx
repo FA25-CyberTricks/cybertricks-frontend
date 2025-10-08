@@ -56,7 +56,7 @@ export default function Header() {
   // xử lý logout
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", {
+      await fetch("https://localhost:7229/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

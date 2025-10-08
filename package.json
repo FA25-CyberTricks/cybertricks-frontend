@@ -40,5 +40,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://localhost:7229"
+  "engines": { "node": "18.x" }
 }
