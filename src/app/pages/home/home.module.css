@@ -38,7 +38,7 @@
   padding: 96px 0 56px;
 
   /* 🖼️ Background thêm vào */
-  background: url("../../../../assets/images/home-1.jpg") center/cover no-repeat;
+  background: url("../../../assets/images/home-1.jpg") center/cover no-repeat;
   min-height: 600px;
   color: #fff; /* để chữ nổi trên ảnh */
   display: flex;
@@ -72,7 +72,7 @@
   justify-content: end;
   align-items: flex-end;
   display: flex;
-  background: url("../../../../assets/images/home-3.jpg") center/cover no-repeat !important; 
+  background: url("../../../assets/images/home-3.jpg") center/cover no-repeat !important; 
 }
 
 /* .section3 {
@@ -98,7 +98,7 @@
 }
 
 .section4{
-    background: url("../../../../assets/images/bg-gradient.png") center/cover no-repeat;
+    background: url("../../../assets/images/bg-gradient.png") center/cover no-repeat;
 }
 
 .section4 .h1{

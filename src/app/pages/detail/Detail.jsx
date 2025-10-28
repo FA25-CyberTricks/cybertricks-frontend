@@ -10,7 +10,7 @@ import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import useDragScroll from "../detail/hook/useDragScroll";
-import "../../../../assets/css/user-global.css";
+import "../../../assets/css/user-global.css";
 import styles from "./detail.module.css";
 
 /* =================== module-scope helpers/constants =================== */

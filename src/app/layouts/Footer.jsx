@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../assets/css/user-global.css"; // import css role user
+import "../../assets/css/user-global.css"; // import css role user
 
 export default function Footer() {
   return (
