@@ -1,7 +1,7 @@
 import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
-import "../../../../assets/css/user-global.css";
+import "../../../assets/css/user-global.css";
 import styles from "./home.module.css";
 
 export default function Home() {
@@ -34,10 +34,10 @@ export default function Home() {
               </p>
 
               <div className={styles["cta-row"]}>
-                <a className={`btn ${styles["btn-primary"]}`} href="#start">
+                <a className={`btn ${styles["btn-primary"]}`} href="/browse">
                   Start Booking
                 </a>
-                <a className={`btn ${styles["btn-ghost"]}`} href="/browse">
+                <a className={`btn ${styles["btn-ghost"]}`} href="#more">
                   More
                 </a>
               </div>
