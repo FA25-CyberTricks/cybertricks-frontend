@@ -5,9 +5,9 @@ import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import styles from "./browse.module.css";
-import "../../../../assets/css/user-global.css";
+import "../../../assets/css/user-global.css";
 
-// Helpers ----------------------------------------------------
+// ========== Helpers (UI) ==========
 function Stars({ value }) {
   const full = Math.max(0, Math.min(5, value ?? 0));
   return (
@@ -30,7 +30,7 @@ function toKmFromLatitude(lat) {
   return `~ ${v.toFixed(1)} km`;
 }
 
-// Chuẩn hóa key cho an toàn (BE PascalCase/camelCase) --------
+// ========== Helpers (DTO) ==========
 function normalizeDto(dto) {
   return {
     storeId: dto?.storeId ?? dto?.StoreId,
@@ -41,10 +41,12 @@ function normalizeDto(dto) {
     latitude: dto?.latitude ?? dto?.Latitude,
     visited: dto?.visited ?? dto?.Visited,
     avatar: dto?.avatar ?? dto?.Avatar ?? null,
+    // Nếu BE có thêm các field khác như Rating/PricePerHour thì map vào đây
+    rating: dto?.rating ?? dto?.Rating,
+    pricePerHour: dto?.pricePerHour ?? dto?.PricePerHour,
   };
 }
 
-// Map StoreDto -> UI item cho template ------------------------
 function mapStoreDtoToCard(dto, idx) {
   return {
     id: dto.storeId ?? idx + 1,
@@ -54,107 +56,172 @@ function mapStoreDtoToCard(dto, idx) {
     statusText: "Đang hoạt động",
     address: dto.address ?? "Đang cập nhật địa chỉ",
     price: "10 – 12.000 VND / 1 Hour",
-    visited: `${dto.visited} visited`,
-    stars: 4,
+    visited: `${dto.visited ?? 0} visited`,
+    stars: Math.max(0, Math.min(5, Number(dto.rating) || 4)),
     latitude: dto.latitude,
   };
 }
 
+// ========== Helpers (OData) ==========
+function escapeODataString(s) {
+  // OData: escape single-quote
+  return s.replace(/'/g, "''");
+}
+
+/**
+ * Ưu tiên order theo nhóm Visited > Rating > Cost
+ * - Visited: "most-least" (desc), "least-most" (asc), "favourite" (desc)
+ * - Rating: "high-low" (desc), "low-high" (asc)
+ * - Cost: "expensive-cheap" (desc), "cheap-expensive" (asc)
+ * Đổi tên field ở đây cho khớp BE (nếu khác):
+ *  - Visited -> Visited
+ *  - Rating  -> Rating
+ *  - Price   -> PricePerHour
+ */
+function buildOrderBy(costOrder, ratingOrder, visitedOrder) {
+  if (visitedOrder === "most-least") return "Visited desc";
+  if (visitedOrder === "least-most") return "Visited asc";
+  if (visitedOrder === "favourite") return "Visited desc"; // hoặc Favourite desc nếu bạn có cờ riêng
+
+  if (ratingOrder === "high-low") return "Rating desc";
+  if (ratingOrder === "low-high") return "Rating asc";
+
+  if (costOrder === "expensive-cheap") return "PricePerHour desc";
+  if (costOrder === "cheap-expensive") return "PricePerHour asc";
+
+  return "Name asc";
+}
+
+function buildFilter(q) {
+  if (!q || !q.trim()) return "";
+  const k = escapeODataString(q.trim());
+  // Tìm theo Name + Address (đổi field nếu BE khác)
+  return `contains(Name,'${k}') or contains(Address,'${k}')`;
+}
+
+async function fetchStoresOData({
+  baseUrl,
+  q,
+  top = 12,
+  skip = 0,
+  costOrder,
+  ratingOrder,
+  visitedOrder,
+  signal,
+}) {
+  const $orderby = buildOrderBy(costOrder, ratingOrder, visitedOrder);
+  const filter = buildFilter(q);
+
+  const params = new URLSearchParams();
+  params.set("$top", String(top));
+  params.set("$skip", String(skip));
+  params.set("$count", "true");
+  params.set("$orderby", $orderby);
+  if (filter) params.set("$filter", filter);
+  // Nếu cần mở rộng điều hướng: params.set("$expand", "Brand");
+
+  const url = `${baseUrl}/odata/Stores?${params.toString()}`;
+  const res = await fetch(url, { cache: "no-store", signal });
+  if (!res.ok) throw new Error(`OData error ${res.status}`);
+  return res.json(); // OData v4: { value: [...], @odata.count: N }
+}
+
+// ========== Component ==========
 export default function ListPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const location = useLocation();
 
-  // --- UI state cho các radio ---
-  const [costOrder, setCostOrder] = useState("");     // "expensive-cheap" | "cheap-expensive" | ""
-  const [ratingOrder, setRatingOrder] = useState(""); // "low-high" | "high-low" | ""
+  // Radio states
+  const [costOrder, setCostOrder] = useState("");      // "expensive-cheap" | "cheap-expensive" | ""
+  const [ratingOrder, setRatingOrder] = useState("");  // "low-high" | "high-low" | ""
   const [visitedOrder, setVisitedOrder] = useState(""); // "most-least" | "least-most" | "favourite" | ""
 
-  // Tính Desc từ giá trị truyền vào (tránh đọc state cũ)
-  function computeDescFrom(c, r, v) {
-    if (v === "most-least" || v === "favourite") return true;
-    if (v === "least-most") return false;
-    if (r === "high-low") return true;
-    if (r === "low-high") return false;
-    if (c === "expensive-cheap") return true;
-    if (c === "cheap-expensive") return false;
-    return false;
-  }
+  // Đổi sang env của bạn:
+  // CRA: REACT_APP_API_BASE_URL
+  // Vite: import.meta.env.VITE_API_BASE_URL (nếu bạn dùng Vite, thay dòng dưới)
+  const API_BASE = process.env.REACT_APP_API_BASE_URL || "https://localhost:7229";
 
-  async function fetchAll() {
-    setLoading(true);
-    try {
-      const res = await fetch("https://localhost:7229/api/Store/GetAll/all", { cache: "no-store" }); // ✅ sửa endpoint
-      const json = await res.json();
-      const arr = Array.isArray(json?.data) ? json.data : [];
-      setItems(arr.map((dto, i) => mapStoreDtoToCard(normalizeDto(dto), i)));
-    } catch {
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchPaged(desc, q) {
-    const params = new URLSearchParams({
-      PageIndex: "1",
-      PageSize: "12",
-      SortBy: "DisplayOrder",
-      Desc: String(!!desc),
-    });
-    if (q && q.trim().length) params.set("q", q.trim());
-
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/Store/GetPaged?${params.toString()}`, { cache: "no-store" });
-      const json = await res.json();
-      const paged = json?.data;
-      const arr = Array.isArray(paged?.items) ? paged.items : Array.isArray(paged) ? paged : [];
-      setItems(arr.map((dto, i) => mapStoreDtoToCard(normalizeDto(dto), i)));
-    } catch {
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // Đọc ?q= lần đầu / khi URL đổi
+  // Load lần đầu / khi URL ?q= đổi
   useEffect(() => {
+    const controller = new AbortController();
     const sp = new URLSearchParams(location.search);
-    const q = sp.get("q")?.trim() ?? "";
+    const q = sp.get("q")?.trim() || "";
     setSearch(q);
-    if (q) {
-      const desc = computeDescFrom(costOrder, ratingOrder, visitedOrder);
-      fetchPaged(desc, q);
-    } else {
-      fetchAll();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search]);
 
-  // Handlers radio: tính desc từ "giá trị mới" rồi fetchPaged
+    (async () => {
+      setLoading(true);
+      try {
+        const json = await fetchStoresOData({
+          baseUrl: API_BASE,
+          q,
+          top: 12,
+          skip: 0,
+          costOrder,
+          ratingOrder,
+          visitedOrder,
+          signal: controller.signal,
+        });
+        const arr = Array.isArray(json?.value) ? json.value : [];
+        setItems(arr.map((raw, i) => mapStoreDtoToCard(normalizeDto(raw), i)));
+      } catch (e) {
+        setItems([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]); // chỉ reload khi query-string đổi
+
+  // Fetch lại với order hiện tại
+  async function refetchWithCurrentOrders() {
+    const controller = new AbortController();
+    setLoading(true);
+    try {
+      const json = await fetchStoresOData({
+        baseUrl: API_BASE,
+        q: search,
+        top: 12,
+        skip: 0,
+        costOrder,
+        ratingOrder,
+        visitedOrder,
+        signal: controller.signal,
+      });
+      const arr = Array.isArray(json?.value) ? json.value : [];
+      setItems(arr.map((raw, i) => mapStoreDtoToCard(normalizeDto(raw), i)));
+    } catch (e) {
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Handlers radio (order only)
   const onCostChange = (value) => {
-    const nextDesc = computeDescFrom(value, ratingOrder, visitedOrder);
     setCostOrder(value);
-    fetchPaged(nextDesc, search);
+    // Nếu muốn mỗi lần chỉ 1 nhóm “thắng thế”, có thể reset 2 nhóm kia:
+    // setRatingOrder(""); setVisitedOrder("");
+    refetchWithCurrentOrders();
   };
   const onRatingChange = (value) => {
-    const nextDesc = computeDescFrom(costOrder, value, visitedOrder);
     setRatingOrder(value);
-    fetchPaged(nextDesc, search);
+    // setCostOrder(""); setVisitedOrder("");
+    refetchWithCurrentOrders();
   };
   const onVisitedChange = (value) => {
-    const nextDesc = computeDescFrom(costOrder, ratingOrder, value);
     setVisitedOrder(value);
-    fetchPaged(nextDesc, search);
+    // setCostOrder(""); setRatingOrder("");
+    refetchWithCurrentOrders();
   };
 
-  // Search box: Enter/click → gọi GetPaged với Desc hiện tại
+  // Search box: Enter → fetch theo order hiện tại
   const onSearchKeyDown = (e) => {
     if (e.key === "Enter") {
-      const desc = computeDescFrom(costOrder, ratingOrder, visitedOrder);
-      fetchPaged(desc, search);
+      refetchWithCurrentOrders();
     }
   };
 
@@ -167,7 +234,7 @@ export default function ListPage() {
         <div className={`${styles["list-layout"]} ${styles["scale-wrap"]}`}>
           {/* Filters */}
           <aside className={styles.filters}>
-            <h1 className={styles["page-title"]}>Browse</h1>
+            <h1 className={styles["page-title"]}>Cyber Cafés</h1>
 
             <div className={styles["filter-block"]}>
               <label className={styles.label}>Search</label>
@@ -183,10 +250,7 @@ export default function ListPage() {
                   className={styles["circle-btn"]}
                   aria-label="Go"
                   type="button"
-                  onClick={() => {
-                    const desc = computeDescFrom(costOrder, ratingOrder, visitedOrder);
-                    fetchPaged(desc, search);
-                  }}
+                  onClick={refetchWithCurrentOrders}
                   title="Search"
                 >
                   <svg viewBox="0 0 24 24">
@@ -202,7 +266,7 @@ export default function ListPage() {
               </div>
             </div>
 
-            {/* Các block khác giữ nguyên UI */}
+            {/* Area (chưa hook API – giữ UI) */}
             <div className={styles["filter-block"]}>
               <label className={styles.label}>Area</label>
               <div className={styles["input-with-icon"]}>
@@ -215,6 +279,7 @@ export default function ListPage() {
               </div>
             </div>
 
+            {/* Cost */}
             <div className={styles["filter-block"]}>
               <label className={styles.label}>Cost</label>
               <label className={styles.radio}>
@@ -237,6 +302,7 @@ export default function ListPage() {
               </label>
             </div>
 
+            {/* Rating */}
             <div className={styles["filter-block"]}>
               <label className={styles.label}>Rating</label>
               <label className={styles.radio}>
@@ -259,6 +325,7 @@ export default function ListPage() {
               </label>
             </div>
 
+            {/* Visited */}
             <div className={styles["filter-block"]}>
               <label className={styles.label}>Visited</label>
               <label className={styles.radio}>

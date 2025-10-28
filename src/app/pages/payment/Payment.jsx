@@ -5,7 +5,7 @@ import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import styles from "./payment.module.css";
-import "../../../../assets/css/user-global.css";
+import "../../../assets/css/user-global.css";
 
 // ===== helpers =====
 const pad2 = (n) => String(n).padStart(2, "0");

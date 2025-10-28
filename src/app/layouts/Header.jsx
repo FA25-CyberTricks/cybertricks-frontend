@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { User, Settings, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { HashLink } from "react-router-hash-link";
 
-import "../../../assets/css/user-global.css";
+import "../../assets/css/user-global.css";
 
 export default function Header() {
   const [showNotif, setShowNotif] = useState(false);
@@ -167,7 +167,7 @@ export default function Header() {
                 marginBottom: "10px",
               }}
             >
-              <div className="avatar" style={{ width: "46px", height: "46px" }}>
+              <div className="avatar">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 22c1.657 0 3-1.343 3-3H9c0 1.657 1.343 3 3 3Zm7-7v-5a7 7 0 10-14 0v5l-2 2v1h18v-1l-2-2Z"
@@ -199,8 +199,6 @@ export default function Header() {
                 className="icon-btn"
                 style={{
                   padding: 0,
-                  border: "none",
-                  background: "transparent",
                 }}
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
@@ -208,8 +206,8 @@ export default function Header() {
                   src={user.avatarUrl}
                   alt="avatar"
                   style={{
-                    width: "40px",
-                    height: "40px",
+                    width: "100%",
+                    height: "100%",
                     borderRadius: "50%",
                     objectFit: "cover",
                   }}

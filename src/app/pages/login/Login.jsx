@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
-import { useAuth } from "../../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 
 import Header from "../../layouts/Header";
 import PasswordField from "./PasswordField";
+import GoogleLoginButton from "./GoogleLoginButton";
 
-import "../../../../assets/css/user-global.css";
+import "../../../assets/css/user-global.css";
 import styles from "./login.module.css";
+import env from "../../config/env.js"; 
 
 export default function Login() {
   const navigate = useNavigate();
@@ -34,8 +36,11 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const BE_ORIGIN = `${env.BE_ORIGIN}`;
+    console.log("[ENV] BE_ORIGIN =", env.BE_ORIGIN);
+    
     try {
-      const res = await fetch("https://localhost:7229/api/auth/login", {
+      const res = await fetch(`${BE_ORIGIN}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -71,66 +76,6 @@ export default function Login() {
       console.error("Error:", err);
       toast.error("Something went wrong, please try again!");
     }
-  };
-
-  const FE_ORIGIN = window.location.origin;
-  const BE_ORIGIN = "https://localhost:7229";
-  const BE_ORIGIN_ONLY = new URL(BE_ORIGIN).origin;
-
-  const handleGoogleLogin = () => {
-    const returnUrl =
-      new URLSearchParams(window.location.search).get("returnUrl") || "/";
-
-    const width = 500,
-      height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    const url =
-      `${BE_ORIGIN}/api/auth/google-login` +
-      `?returnUrl=${encodeURIComponent(returnUrl)}` +
-      `&opener=${encodeURIComponent(FE_ORIGIN)}`;
-
-    const popup = window.open(
-      url,
-      "googleLogin",
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
-
-    if (!popup) {
-      toast.error("Popup bị chặn. Hãy cho phép popup cho trang này.");
-      return;
-    }
-
-    function onMessage(e) {
-      if (e.origin !== BE_ORIGIN_ONLY) return; // chặn cross-origin
-      if (e.source !== popup) return; // chỉ nhận đúng popup
-
-      try {
-        const data = e.data;
-        if (data && data.token) {
-          setAccessToken(data.token);
-          if (data.user) setUser(data.user);
-          toast.success("Google login success!");
-          navigate(data.returnUrl || "/");
-        } else if (data && data.error) {
-          toast.error("Google login failed: " + data.error);
-        }
-      } finally {
-        window.removeEventListener("message", onMessage);
-        if (popup && !popup.closed) popup.close();
-      }
-    }
-
-    window.addEventListener("message", onMessage, { once: true });
-
-    // Tuỳ chọn: dọn dẹp khi user tự đóng popup
-    const timer = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(timer);
-        window.removeEventListener("message", onMessage);
-      }
-    }, 500);
   };
 
   return (
@@ -182,18 +127,7 @@ export default function Login() {
             Sign in
           </button>
 
-          <button
-            className={styles["btn-google"]}
-            type="button"
-            onClick={handleGoogleLogin}
-          >
-            <img
-              src="assets/images/google-logo.png"
-              alt="Google"
-              style={{ width: "40px", height: "40px" }}
-            />
-            Continue with Google
-          </button>
+        <GoogleLoginButton className={styles["btn-google"]} />
 
           <p className={styles.signup}>
             Don&apos;t have account?{" "}

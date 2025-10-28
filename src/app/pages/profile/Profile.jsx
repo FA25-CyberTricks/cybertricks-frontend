@@ -1,59 +1,48 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
 import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import styles from "./profile.module.css";
-import "../../../../assets/css/user-global.css";
+import "../../../assets/css/user-global.css";
+import env from "../../config/env";
+import { Gender } from "../../../constants/enums";
 
-import { useAuth } from "../../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
+import FavoritesSection from "./FavoritesSection";
+import MyBookingSection from "./MyBookingSection";
 
 export default function Profile() {
-  const { user: authUser, setUser, setAccessToken } = useAuth();
+  // Lấy token & trạng thái auth từ Context (đÃ refresh ở AuthProvider)
+  const {
+    user: authUser,
+    setUser,
+    setAccessToken,
+    accessToken,
+    loading: authLoading,
+  } = useAuth();
 
-  const [token, setToken] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState(null);
-  const fileInputRef = useRef(null);
-
-  // states
-  const [bootstrapping, setBootstrapping] = useState(true);
+  // UI states
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [changingPw, setChangingPw] = useState(false);
 
-  // headers cho JSON
-  const jsonHeaders = useMemo(
-    () => ({
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    }),
-    [token]
-  );
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   const [profile, setProfile] = useState({
     id: "",
     email: "",
-    fullName: "",
     firstName: "",
     lastName: "",
     avatarUrl: "",
-    subscriptionType: "",
-    subscriptionStartDate: "",
-    subscriptionEndDate: "",
-    isActive: false,
-    createdAt: "",
-    updatedAt: "",
-    lastLogin: "",
-    roles: [],
   });
 
-  // Các field chỉ trên UI
   const [extra, setExtra] = useState({
-    birth: "",
-    gender: "male",
-    phone: "",
+    birth: "", // yyyy-MM-dd
+    gender: "", // "male" | "female" | "other"
+    phoneNumber: "",
     address: "",
   });
 
@@ -63,81 +52,84 @@ export default function Profile() {
     confirmPassword: "",
   });
 
-  // === Step 1: đảm bảo có token (refresh bằng HttpOnly cookie) ===
+  // Headers JSON có Bearer nếu có accessToken
+  const jsonHeaders = useMemo(
+    () => ({
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    }),
+    [accessToken]
+  );
+
+  // helpers
+  const safeJson = async (res) => {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+
+  const handleApiError = async (res) => {
+    if (res.status === 401 || res.status === 403) {
+      toast.warn("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+      setAccessToken?.(null);
+      setUser?.(null);
+      return;
+    }
+    const json = await safeJson(res);
+    if (json?.message) toast.error(json.message);
+    else toast.error(`Request failed (${res.status})`);
+  };
+
+  // Lấy profile khi AuthContext đã boot xong và có token
   useEffect(() => {
-    let cancelled = false;
+    if (authLoading) return;
 
-    const ensureToken = async () => {
-      try {
-        const res = await fetch("https://localhost:7229/api/auth/refresh", {
-          method: "POST",
-          credentials: "include",
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (!cancelled) {
-            setToken(data.token ?? null);
-            setAccessToken?.(data.token ?? null);
-            if (data.user) setUser?.(data.user);
-          }
-        } else {
-          if (!cancelled) setToken(null);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.error("Refresh failed:", err);
-          setToken(null);
-        }
-      } finally {
-        if (!cancelled) setBootstrapping(false);
-      }
-    };
-
-    ensureToken();
-    return () => {
-      cancelled = true;
-    };
-  }, [setAccessToken, setUser]);
-
-  // === Step 2: lấy profile khi đã xong bootstrapping & có token ===
-  useEffect(() => {
-    if (bootstrapping) return;
-
-    if (!token) {
+    if (!accessToken) {
       setLoading(false);
       return;
     }
 
     const controller = new AbortController();
 
+    // Đặt trong effect để khỏi phải đưa vào dependency array
+    const onApiError = async (res) => {
+      if (res.status === 401 || res.status === 403) {
+        toast.warn("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        setAccessToken?.(null);
+        setUser?.(null);
+        return;
+      }
+      try {
+        const json = await res.json();
+        if (json?.message) toast.error(json.message);
+        else toast.error(`Request failed (${res.status})`);
+      } catch {
+        toast.error(`Request failed (${res.status})`);
+      }
+    };
+
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        const res = await fetch("https://localhost:7229/api/profile/me", {
+        const res = await fetch(`${env.BE_ORIGIN}/api/profile/me`, {
           method: "GET",
           headers: jsonHeaders,
           signal: controller.signal,
         });
 
         if (res.status === 401 || res.status === 403) {
-          toast.warn("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-          setToken(null);
-          setAccessToken?.(null);
-          setUser?.(null);
+          await onApiError(res);
           return;
         }
-
         if (!res.ok) {
-          const json = await safeJson(res);
-          toast.error(json?.message || `Request failed (${res.status})`);
+          await onApiError(res);
           return;
         }
 
         const data = await res.json();
         setProfile((p) => ({ ...p, ...data }));
-
-        // Đồng bộ một phần lên context (phục vụ header/avatar, v.v.)
         setUser?.((u) => ({
           ...(u || {}),
           id: data.id,
@@ -146,8 +138,14 @@ export default function Profile() {
           firstName: data.firstName,
           lastName: data.lastName,
           avatarUrl: data.avatarUrl,
-          role: data.roles, // giữ nguyên mảng
+          roles: data.roles,
         }));
+        setExtra({
+          birth: data.birth ?? "",
+          gender: data.genderName ?? Gender.Male,
+          phoneNumber: data.phoneNumber ?? "",
+          address: data.address ?? "",
+        });
       } catch (err) {
         if (err.name !== "AbortError") {
           console.error(err);
@@ -160,9 +158,9 @@ export default function Profile() {
 
     fetchProfile();
     return () => controller.abort();
-  }, [bootstrapping, token, jsonHeaders, setUser, setAccessToken]);
+  }, [authLoading, accessToken, jsonHeaders, setUser, setAccessToken]);
 
-  // cleanup preview URL khi unmount hoặc đổi ảnh
+  // cleanup preview URL khi unmount/đổi ảnh
   useEffect(() => {
     return () => {
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
@@ -170,28 +168,7 @@ export default function Profile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const safeJson = async (res) => {
-    try {
-      return await res.json();
-    } catch {
-      return null;
-    }
-  };
-
-  const handleApiError = async (res) => {
-    if (res.status === 401 || res.status === 403) {
-      toast.warn("Your session has expired. Please log in again..");
-      setToken(null);
-      setAccessToken?.(null);
-      setUser?.(null);
-      return;
-    }
-    const json = await safeJson(res);
-    if (json?.message) toast.error(json.message);
-    else toast.error(`Request failed (${res.status})`);
-  };
-
-  // ===== Handlers =====
+  // handlers
   const handleChangeProfile = (field) => (e) => {
     setProfile((p) => ({ ...p, [field]: e.target.value }));
   };
@@ -202,9 +179,13 @@ export default function Profile() {
     setExtra((x) => ({ ...x, [field]: value }));
   };
 
+  const handleChangePw = (field) => (e) => {
+    setPw((s) => ({ ...s, [field]: e.target.value }));
+  };
+
   const submitUpdateProfile = async () => {
-    if (!token) {
-      toast.error("No change yet.");
+    if (!accessToken) {
+      toast.error("Bạn chưa đăng nhập.");
       return;
     }
     if (updating) return;
@@ -212,17 +193,26 @@ export default function Profile() {
     try {
       setUpdating(true);
       const formData = new FormData();
-      formData.append("FullName", profile.fullName || "");
-      formData.append("FirstName", profile.firstName || "");
-      formData.append("LastName", profile.lastName || "");
+      if (profile.firstName?.trim())
+        formData.append("FirstName", profile.firstName.trim());
+      if (profile.lastName?.trim())
+        formData.append("LastName", profile.lastName.trim());
+
+      if (extra.phoneNumber?.trim())
+        formData.append("PhoneNumber", extra.phoneNumber.trim());
+      if (extra.address?.trim())
+        formData.append("Address", extra.address.trim());
+      if (extra.birth?.trim())
+        formData.append("DateOfBirth", extra.birth.trim());
+      if (extra.gender) formData.append("Gender", extra.gender);
       if (selectedFile) {
         formData.append("avatarFile", selectedFile);
       }
 
-      const res = await fetch("https://localhost:7229/api/profile/update", {
+      const res = await fetch(`${env.BE_ORIGIN}/api/profile/update`, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`, // không set Content-Type ở multipart
+          Authorization: `Bearer ${accessToken}`, // KHÔNG set Content-Type khi dùng FormData
         },
         body: formData,
       });
@@ -243,7 +233,7 @@ export default function Profile() {
         setSelectedFile(null);
       } else {
         // fallback: gọi lại /me
-        const refresh = await fetch("https://localhost:7229/api/profile/me", {
+        const refresh = await fetch(`${env.BE_ORIGIN}/api/profile/me`, {
           method: "GET",
           headers: jsonHeaders,
         });
@@ -263,17 +253,13 @@ export default function Profile() {
     }
   };
 
-  const handleChangePw = (field) => (e) => {
-    setPw((s) => ({ ...s, [field]: e.target.value }));
-  };
-
   const canSubmitPw =
     pw.currentPassword.trim().length > 0 &&
     pw.newPassword.trim().length >= 6 &&
     pw.newPassword === pw.confirmPassword;
 
   const submitChangePassword = async () => {
-    if (!token) {
+    if (!accessToken) {
       toast.error("Bạn chưa đăng nhập.");
       return;
     }
@@ -284,7 +270,7 @@ export default function Profile() {
 
     try {
       setChangingPw(true);
-      const res = await fetch("https://localhost:7229/api/profile/change-password", {
+      const res = await fetch(`${env.BE_ORIGIN}/api/profile/change-password`, {
         method: "POST",
         headers: jsonHeaders,
         body: JSON.stringify({
@@ -322,12 +308,11 @@ export default function Profile() {
   return (
     <>
       <div className="bg-gradient"></div>
-
       <Header />
       <main className="container" style={{ padding: "100px 0px 50px 0px" }}>
         <h1 className={styles["page-title"]}>Profile</h1>
 
-        {bootstrapping || loading ? (
+        {authLoading || loading ? (
           <div style={{ opacity: 0.8 }}>Loading profile…</div>
         ) : (
           <>
@@ -418,7 +403,9 @@ export default function Profile() {
                   </div>
 
                   <div className={`${styles.frow} ${styles.two}`}>
+                    {" "}
                     <input
+                      type="date"
                       placeholder="Birth"
                       value={extra.birth}
                       onChange={handleChangeExtra("birth")}
@@ -445,6 +432,16 @@ export default function Profile() {
                         />{" "}
                         Female
                       </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="g"
+                          value="other"
+                          checked={extra.gender === "other"}
+                          onChange={handleChangeExtra("gender")}
+                        />{" "}
+                        Other
+                      </label>
                     </div>
                   </div>
 
@@ -460,8 +457,8 @@ export default function Profile() {
                   <div className={styles.frow}>
                     <input
                       placeholder="Phone number"
-                      value={extra.phone}
-                      onChange={handleChangeExtra("phone")}
+                      value={extra.phoneNumber}
+                      onChange={handleChangeExtra("phoneNumber")}
                     />
                   </div>
                   <div className={styles.frow}>
@@ -517,68 +514,8 @@ export default function Profile() {
               </aside>
             </section>
 
-            {/* Favourites (static sample) */}
-            <section className={styles.favs}>
-              <h2>My favourites:</h2>
-              <ul className={styles["fav-list"]}>
-                <li>
-                  <span>• CyberCore – Gaming D.C</span>
-                  <Link
-                    className={`${styles.btn} ${styles.red} ${styles.pill}`}
-                    to="/detail/5">
-                    Visit
-                  </Link>
-                </li>
-                <li>
-                  <span>• CyberCore GIK Town</span>
-                  <Link
-                    className={`${styles.btn} ${styles.red} ${styles.pill}`}
-                    to="/detail/6">
-                    Visit
-                  </Link>
-                </li>
-              </ul>
-            </section>
-
-            {/* Booking (static sample) */}
-            <section className={styles["booking-card"]}>
-              <h2>My booking</h2>
-              <div className={styles.ticket}>
-                <div className={styles["t-left"]}>
-                  <h3>CyberCore – Gaming D.C</h3>
-                  <p>
-                    Toà nhà Xi Grand Court, 258 Lý Thường Kiệt, Phường 14, Quận
-                    10, Hồ Chí Minh City, Vietnam
-                  </p>
-                  <div className={styles.details}>
-                    <div>
-                      <div>
-                        <strong>Hour:</strong> 7:00 – 8:00
-                      </div>
-                      <div>
-                        <strong>Floor:</strong> 1
-                      </div>
-                      <div>
-                        <strong>Chair:</strong> 2
-                      </div>
-                    </div>
-                    <div>
-                      <div>
-                        <strong>Food:</strong> 2 Mỳ tôm 2 trứng
-                      </div>
-                      <div>
-                        <strong>Drink:</strong> 2 Sting đỏ
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles["t-right"]}>
-                  <div className={styles.total}>
-                    Total : <span>74.000 VND</span>
-                  </div>
-                </div>
-              </div>
-            </section>
+            <FavoritesSection />
+            <MyBookingSection />
           </>
         )}
       </main>

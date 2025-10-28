@@ -3,7 +3,7 @@ import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 
 import styles from "./faq.module.css";
-import "../../../../assets/css/user-global.css";
+import "../../../assets/css/user-global.css";
 export default function FAQ() {
   return (
     <>

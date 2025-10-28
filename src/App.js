@@ -2,20 +2,20 @@ import { AuthProvider } from "./context/AuthContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
-import Home from "./app/user/pages/home/Home";
-import Login from "./app/user/pages/login/Login";
-import Register from "./app/user/pages/login/Register";
-import Profile from "./app/user/pages/profile/Profile";
-import Faq from "./app/user/pages/faq/Faq";
-import Browse from "./app/user/pages/browse/Browse";
-import Detail from "./app/user/pages/detail/Detail";
-import Payment from "./app/user/pages/payment/Payment";
+import Home from "./app/pages/home/Home";
+import Login from "./app/pages/login/Login";
+import Register from "./app/pages/login/Register";
+import Profile from "./app/pages/profile/Profile";
+import Faq from "./app/pages/faq/Faq";
+import Browse from "./app/pages/browse/Browse";
+import Detail from "./app/pages/detail/Detail";
+import Payment from "./app/pages/payment/Payment";
+import ChatWidget from "./components/chats/ChatWidget";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -27,7 +27,7 @@ function App() {
           <Route path="/browse" element={<Browse />} />
           <Route path="/detail/:shopId" element={<Detail />} />
 
-             {/* protected route */}
+          {/* protected route */}
           <Route
             path="/profile"
             element={
@@ -37,7 +37,7 @@ function App() {
             }
           />
 
-           <Route
+          <Route
             path="/payment/:shopId"
             element={
               <ProtectedRoute>
@@ -49,13 +49,19 @@ function App() {
 
         {/* toast message */}
         <ToastContainer
-          position="bottom-right"
+          position="top-right" // vẫn cần một vị trí hợp lệ
           autoClose={3000}
           hideProgressBar={false}
           newestOnTop
           closeOnClick
           pauseOnHover
+          style={{
+            top: "75%", // dịch xuống 3/4 màn hình
+            transform: "translateY(-50%)", // căn giữa chính xác theo trục Y
+          }}
         />
+
+        <ChatWidget />
       </BrowserRouter>
     </AuthProvider>
   );
