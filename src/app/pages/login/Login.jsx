@@ -1,22 +1,20 @@
+// src/components/auth/Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { toast } from "react-toastify";
 
 import { useAuth } from "../../../context/AuthContext";
-
 import Header from "../../layouts/Header";
 import PasswordField from "./PasswordField";
 import GoogleLoginButton from "./GoogleLoginButton";
 
 import "../../../assets/css/user-global.css";
 import styles from "./login.module.css";
-import env from "../../config/env.js"; 
+import env from "../../config/env.js";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setAccessToken, setUser } = useAuth(); // lấy setter
-
+  const { setAccessToken, setUser } = useAuth();
   const params = new URLSearchParams(window.location.search);
 
   const [formData, setFormData] = useState({
@@ -36,9 +34,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const BE_ORIGIN = `${env.BE_ORIGIN}`;
-    console.log("[ENV] BE_ORIGIN =", env.BE_ORIGIN);
-    
+    const BE_ORIGIN = env.BE_ORIGIN;
     try {
       const res = await fetch(`${BE_ORIGIN}/api/auth/login`, {
         method: "POST",
@@ -53,25 +49,16 @@ export default function Login() {
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         toast.error(data.message || "Login failed!");
         return;
       }
 
-      // ✅ Lưu access token vào memory (context)
-      if (data.token) {
-        setAccessToken(data.token);
-      }
-      if (data.user) {
-        setUser(data.user); // 👈 chỗ này bạn quên
-      }
+      if (data.token) setAccessToken(data.token);
+      if (data.user) setUser(data.user);
 
       toast.success("Login success!");
-
-      setTimeout(() => {
-        navigate(data.returnUrl || "/");
-      }, 100);
+      setTimeout(() => navigate(data.returnUrl || "/"), 100);
     } catch (err) {
       console.error("Error:", err);
       toast.error("Something went wrong, please try again!");
@@ -127,7 +114,11 @@ export default function Login() {
             Sign in
           </button>
 
-        <GoogleLoginButton className={styles["btn-google"]} />
+          {/* ✅ Truyền navigate xuống GoogleLoginButton */}
+          <GoogleLoginButton
+            className={styles["btn-google"]}
+            navigate={navigate}
+          />
 
           <p className={styles.signup}>
             Don&apos;t have account?{" "}

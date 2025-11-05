@@ -1,12 +1,10 @@
 // src/components/auth/GoogleLoginButton.jsx
 import { toast } from "react-toastify";
 import { useAuth } from "../../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import env from "../../config/env";
 
-export default function GoogleLoginButton({ className }) {
+export default function GoogleLoginButton({ className, navigate }) {
   const { setAccessToken, setUser } = useAuth();
-  const navigate = useNavigate();
 
   const FE_ORIGIN = env.FE_ORIGIN;
   const BE_ORIGIN = env.BE_ORIGIN;
@@ -16,7 +14,8 @@ export default function GoogleLoginButton({ className }) {
     const returnUrl =
       new URLSearchParams(window.location.search).get("returnUrl") || "/";
 
-    const width = 500, height = 600;
+    const width = 500,
+      height = 600;
     const left = window.screenX + (window.outerWidth - width) / 2;
     const top = window.screenY + (window.outerHeight - height) / 2;
 
@@ -30,11 +29,13 @@ export default function GoogleLoginButton({ className }) {
       "googleLogin",
       `width=${width},height=${height},left=${left},top=${top}`
     );
+
     if (!popup) {
       toast.error("Popup bị chặn. Hãy cho phép popup cho trang này.");
       return;
     }
 
+    // Xử lý message trả về từ popup
     function onMessage(e) {
       if (e.origin !== BE_ORIGIN_ONLY) return;
       if (e.source !== popup) return;
@@ -45,7 +46,9 @@ export default function GoogleLoginButton({ className }) {
           setAccessToken(data.token);
           if (data.user) setUser(data.user);
           toast.success("Google login success!");
-          navigate(data.returnUrl || "/");
+
+          // 👇 dùng navigate từ component cha (Login.jsx)
+          if (navigate) navigate(data.returnUrl || "/");
         } else if (data?.error) {
           toast.error("Google login failed: " + data.error);
         }
@@ -57,6 +60,7 @@ export default function GoogleLoginButton({ className }) {
 
     window.addEventListener("message", onMessage, { once: true });
 
+    // Dọn dẹp listener khi popup bị đóng thủ công
     const timer = setInterval(() => {
       if (popup.closed) {
         clearInterval(timer);
