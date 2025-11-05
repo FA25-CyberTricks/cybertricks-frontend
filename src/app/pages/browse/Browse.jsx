@@ -387,7 +387,7 @@ export default function ListPage() {
                     </p>
 
                     <div className={styles.foot}>
-                      <span className={styles.visited}>{item.visited}</span>
+                      {/* <span className={styles.visited}>{item.visited}</span> */}
                       <Stars value={item.stars} />
                       <Link className={styles.btn} to={`/detail/${item.id}`}>
                         Explore

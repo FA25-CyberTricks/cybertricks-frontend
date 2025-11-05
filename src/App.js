@@ -10,7 +10,6 @@ import Faq from "./app/pages/faq/Faq";
 import Browse from "./app/pages/browse/Browse";
 import Detail from "./app/pages/detail/Detail";
 import Payment from "./app/pages/payment/Payment";
-import ChatWidget from "./components/chats/ChatWidget";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,7 +24,17 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/browse" element={<Browse />} />
-          <Route path="/detail/:shopId" element={<Detail />} />
+
+         {/* protected route */}
+          <Route
+            path="/detail/:shopId"
+            element={
+              <ProtectedRoute>
+                <Detail />
+              </ProtectedRoute>
+            }
+          />
+
 
           {/* protected route */}
           <Route
@@ -61,7 +70,6 @@ function App() {
           }}
         />
 
-        <ChatWidget />
       </BrowserRouter>
     </AuthProvider>
   );
