@@ -3,6 +3,7 @@ import { User, Settings, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { HashLink } from "react-router-hash-link";
+import ChatWidget from "../../components/chats/ChatWidget";
 
 import "../../assets/css/user-global.css";
 
@@ -194,55 +195,59 @@ export default function Header() {
           </aside>
 
           {user ? (
-            <div className="user-menu" ref={userMenuRef}>
-              <button
-                className="icon-btn"
-                style={{
-                  padding: 0,
-                }}
-                onClick={() => setShowUserMenu(!showUserMenu)}
-              >
-                <img
-                  src={user.avatarUrl}
-                  alt="avatar"
+            <>
+              <div className="user-menu" ref={userMenuRef}>
+                <button
+                  className="icon-btn"
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "50%",
-                    objectFit: "cover",
+                    padding: 0,
                   }}
-                />
-              </button>
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                >
+                  <img
+                    src={user.avatarUrl}
+                    alt="avatar"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </button>
 
-              {showUserMenu && (
-                <div className="notif-card active dropdown-menu">
-                  <div className="">
-                    <div className="notif-item">
-                      Hi {user.firstName || user.fullName}!
-                    </div>
-                    <div className="notif-item profile-btn">
-                      <Link to="/profile">
-                        <User size={18} style={{ marginRight: "8px" }} />
-                        Profile
-                      </Link>
-                    </div>
-                    <div className="notif-item profile-btn">
-                      <Settings size={18} style={{ marginRight: "8px" }} />
-                      Setting
-                    </div>
-                    <div className="notif-item profile-btn">
-                      <button
-                        className="notif-item logout-btn"
-                        onClick={handleLogout}
-                      >
-                        <LogOut size={18} style={{ marginRight: "8px" }} />
-                        Logout
-                      </button>
+                {showUserMenu && (
+                  <div className="notif-card active dropdown-menu">
+                    <div className="">
+                      <div className="notif-item">
+                        Hi {user.firstName || user.fullName}!
+                      </div>
+                      <div className="notif-item profile-btn">
+                        <Link to="/profile">
+                          <User size={18} style={{ marginRight: "8px" }} />
+                          Profile
+                        </Link>
+                      </div>
+                      <div className="notif-item profile-btn">
+                        <Settings size={18} style={{ marginRight: "8px" }} />
+                        Setting
+                      </div>
+                      <div className="notif-item profile-btn">
+                        <button
+                          className="notif-item logout-btn"
+                          onClick={handleLogout}
+                        >
+                          <LogOut size={18} style={{ marginRight: "8px" }} />
+                          Logout
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+
+              <ChatWidget />
+            </>
           ) : (
             <Link to="/login" className="icon-btn">
               <svg viewBox="0 0 24 24">

@@ -1,47 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom"; // 👈 thêm dòng này
 import "./chat-widget.css";
 
 const MOCK_CONVERSATIONS = [
-  {
-    id: "1",
-    name: "CyberCore - Gaming D.C",
-    avatar: "https://i.pravatar.cc/80?img=1",
-    lastMessage: "Hello 👋 Do you want to booking at my cyber ?",
-  },
-  {
-    id: "2",
-    name: "Cyber Legend",
-    avatar: "https://i.pravatar.cc/80?img=2",
-    lastMessage: "We have promo tonight!",
-  },
-  {
-    id: "3",
-    name: "KOW Esports Stadium",
-    avatar: "https://i.pravatar.cc/80?img=3",
-    lastMessage: "Rank lobby ready.",
-  },
-  {
-    id: "4",
-    name: "Cyber Meow",
-    avatar: "https://i.pravatar.cc/80?img=4",
-    lastMessage: "Meow discount 🐾",
-  },
+  { id: "1", name: "CyberCore - Gaming D.C", avatar: "https://i.pravatar.cc/80?img=1", lastMessage: "Hello 👋 Do you want to booking at my cyber ?" },
+  { id: "2", name: "Cyber Legend", avatar: "https://i.pravatar.cc/80?img=2", lastMessage: "We have promo tonight!" },
+  { id: "3", name: "KOW Esports Stadium", avatar: "https://i.pravatar.cc/80?img=3", lastMessage: "Rank lobby ready." },
+  { id: "4", name: "Cyber Meow", avatar: "https://i.pravatar.cc/80?img=4", lastMessage: "Meow discount 🐾" },
 ];
 
 const initialMsgs = {
   1: [
     {
       id: "m1",
-      fromMe: false, // người ta
+      fromMe: false,
       senderName: "CyberCore - Gaming D.C",
       senderAvatar: "https://i.pravatar.cc/80?img=1",
       text: "Hello 👋 Do you want to booking at my cyber ?",
       time: "09:20",
     },
   ],
-  2: [
-
-  ],
+  2: [],
   3: [],
   4: [],
 };
@@ -57,7 +36,7 @@ export default function ChatWidget() {
   const inputRef = useRef(null);
   const msgEndRef = useRef(null);
 
-  // Scroll to bottom when messages change or panel opens
+  // Auto scroll
   useEffect(() => {
     msgEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, open, activeId]);
@@ -88,7 +67,7 @@ export default function ChatWidget() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Focus input when open
+  // Focus input
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 160);
   }, [open, activeId]);
@@ -98,9 +77,7 @@ export default function ChatWidget() {
     if (!text) return;
 
     const idGen =
-      (window.crypto &&
-        window.crypto.randomUUID &&
-        window.crypto.randomUUID()) ||
+      (window.crypto?.randomUUID?.()) ||
       `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     setMessages((prev) => {
@@ -108,7 +85,7 @@ export default function ChatWidget() {
       const next = {
         id: idGen,
         text,
-        fromMe: true, // của mình
+        fromMe: true,
         senderName: "You",
         senderAvatar: null,
         time: new Date().toLocaleTimeString([], {
@@ -128,7 +105,8 @@ export default function ChatWidget() {
   const activeConv =
     MOCK_CONVERSATIONS.find((c) => c.id === activeId) || MOCK_CONVERSATIONS[0];
 
-  return (
+  // 👇 Từ đây trở xuống là phần render qua Portal
+  return createPortal(
     <>
       {/* Floating button */}
       <button
@@ -136,7 +114,6 @@ export default function ChatWidget() {
         aria-label={open ? "Close chat" : "Open chat"}
         onClick={() => setOpen((v) => !v)}
       >
-        {/* icon message bubble (SVG) */}
         <svg
           className="cw-fab-icon"
           width="26"
@@ -172,9 +149,8 @@ export default function ChatWidget() {
         </div>
 
         <div className="cw-body">
-          {/* Left: conversations */}
+          {/* Sidebar */}
           <aside className="cw-sidebar">
-            {/* search box */}
             <div className="cw-search">
               <input
                 value={search}
@@ -183,7 +159,6 @@ export default function ChatWidget() {
                 aria-label="Search conversations"
               />
             </div>
-
             <ul className="cw-conv-list">
               {filteredConversations.map((c) => (
                 <li
@@ -207,9 +182,8 @@ export default function ChatWidget() {
             </ul>
           </aside>
 
-          {/* Right: chat area */}
+          {/* Chat area */}
           <section className="cw-chat">
-            {/* thread header (optional) */}
             <div className="cw-chat-title" title={activeConv.name}>
               <img
                 src={activeConv.avatar}
@@ -221,13 +195,12 @@ export default function ChatWidget() {
 
             <div className="cw-thread">
               {(messages[activeId] || []).map((m) => {
-                const isLeft = !m.fromMe; // người khác (có tên + avatar) ở bên trái
+                const isLeft = !m.fromMe;
                 return (
                   <div
                     key={m.id}
                     className={`cw-msg-row ${isLeft ? "left" : "right"}`}
                   >
-                    {/* tên + avt chỉ hiện cho người khác */}
                     {isLeft && (
                       <div className="cw-msg-meta">
                         <div className="cw-msg-name">
@@ -249,7 +222,7 @@ export default function ChatWidget() {
               <div ref={msgEndRef} />
             </div>
 
-            {/* Quick actions (demo) */}
+            {/* Quick actions */}
             <div className="cw-actions">
               <button className="cw-chip">Check Machine Status</button>
               <button className="cw-chip">Book Now</button>
@@ -284,6 +257,7 @@ export default function ChatWidget() {
           </section>
         </div>
       </div>
-    </>
+    </>,
+    document.body // 👈 render tách khỏi header nhưng vẫn cùng React tree
   );
 }
